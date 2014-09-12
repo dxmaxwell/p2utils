@@ -36,12 +36,17 @@ for location in locations.findall("location"):
 
     units = location.findall("unit")
     if len(units) == 0:
+        elm = None
         for iu in p2list.p2list(url, "Q:group"):
-            elm = ElementTree.Element("unit")
-            elm.set('id', iu[0])
-            elm.set('version', iu[1])
-            elm.tail = '\n'
-            location.append(elm)
+            if elm is None or iu[0] != elm.get('id'):
+                elm = ElementTree.Element("unit")
+                elm.set('id', iu[0])
+                elm.set('version', iu[1])
+                elm.tail = '\n'
+                location.append(elm)
+            else:
+                elm.set('id', iu[0])
+                elm.set('version', iu[1])
     else:
         ius = p2list.p2list(url)
         for unit in units:
@@ -52,13 +57,18 @@ for location in locations.findall("location"):
             ver = unit.get('version')
             if ver is None:
                 location.remove(unit)
+                elm = None
                 for iu in ius:
                     if iu[0] == id:
-                        elm = ElementTree.Element("unit")
-                        elm.set('id', iu[0])
-                        elm.set('version', iu[1])
-                        elm.tail = '\n'
-                        location.append(elm)
+                        if elm is None or iu[0] != elm.get('id'):
+                            elm = ElementTree.Element("unit")
+                            elm.set('id', iu[0])
+                            elm.set('version', iu[1])
+                            elm.tail = '\n'
+                            location.append(elm)
+                        else:
+                            elm.set('id', iu[0])
+                            elm.set('version', iu[1])
             else:
                 for iu in ius:
                     if iu[0] == id and iu[1] == ver:
